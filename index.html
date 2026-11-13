@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Anniversary!</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Poppins:wght@600;700;800&display=swap');
+    
+    body {
+      font-family: 'Padauk', 'Poppins', sans-serif;
+      background-color: #dcedc8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 10px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Main Container Frame */
+    .app-card {
+      background-color: #dcedc8;
+      border-radius: 28px;
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      position: relative;
+      min-height: 580px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* Floating Music Button */
+    .music-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 45px;
+      height: 45px;
+      background-color: #c8e6c9;
+      border: 2px solid #a5d6a7;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #1b5e20;
+      cursor: pointer;
+      z-index: 50;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .spin-music {
+      animation: spin 3s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Page Switching Animation */
+    .page {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .page.active {
+      display: flex;
+      animation: fadeInScale 0.4s ease-in-out forwards;
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Rounded Media Styles (Videos & Images) */
+    .profile-media-dashed {
+      width: 170px;
+      height: 170px;
+      border-radius: 24px;
+      border: 3px dashed #81c784;
+      object-fit: cover;
+      padding: 4px;
+      background-color: #fff;
+    }
+
+    .profile-media-circle {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      border: 3px dashed #81c784;
+      object-fit: cover;
+      padding: 4px;
+      background-color: #fff;
+    }
+
+    /* Keypad Buttons with Light Green Circles */
+    .keypad-btn {
+      width: 55px;
+      height: 55px;
+      background-color: white;
+      border: 2.5px solid #a5d6a7;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #2e7d32;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: transform 0.1s, background-color 0.2s;
+    }
+
+    .keypad-btn:active {
+      transform: scale(0.92);
+      background-color: #e8f5e9;
+    }
+
+    /* Action & Back Buttons */
+    .nav-btn {
+      background-color: #a5d6a7;
+      color: #1b5e20;
+      font-weight: bold;
+      padding: 8px 26px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      background-color: #81c784;
+    }
+
+    /* Game Canvas Wrapper */
+    .game-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+    }
+
+    #gameCanvas {
+      background-color: #ffffff;
+      border-radius: 16px;
+      border: 2px solid #e0e0e0;
+      touch-action: none;
+    }
+
+    /* Feedback Text Animation on Catching Heart */
+    .feedback-text {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #2e7d32;
+      font-weight: bold;
+      font-size: 1rem;
+      padding: 4px 14px;
+      border-radius: 20px;
+      border: 2px solid #a5d6a7;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      pointer-events: none;
+      animation: floatUpFade 1.2s ease-out forwards;
+      z-index: 10;
+    }
+
+    @keyframes floatUpFade {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 10px) scale(0.8);
+      }
+      20% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1.1);
+      }
+      80% {
+        opacity: 1;
+        transform: translate(-50%, -5px) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -20px) scale(0.9);
+      }
+    }
+
+    /* Passcode Asterisks (*) */
+    .passcode-input {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.25rem;
+      color: #1b5e20;
+    }
+
+    /* Title Font styling */
+    .enter-passcode-title {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      color: #1b5e20;
+      letter-spacing: 0.05em;
+    }
+
+    /* 3x2 Grid Gallery Container */
+    .grid-gallery-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto 1.5rem auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Audio Element for Music -->
+  <audio id="bgMusic" src="just.mp3" loop preload="auto"></audio>
+
+  <div class="app-card" id="mainAppCard">
+    
+    <!-- Music Button -->
+    <div class="music-btn" id="musicBtn" onclick="toggleAudio()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+      </svg>
+    </div>
+
+    <!-- PAGE 1: PASSCODE LOCK SCREEN (Video 1 & Hint eg: 230826) -->
+    <div id="page1" class="page active">
+            <img src="1.jpg" class="profile-media-circle my-6" autoplay muted loop playsinline webkit-playsinline>
+      <h2 class="enter-passcode-title text-lg mb-1">ENTER PASSCODE</h2>
+      <p class="text-xs text-green-700 font-semibold mb-2">(eg: 230826)</p>
+      
+      <div class="bg-white px-6 py-2 rounded-full w-3/4 mb-4 shadow-inner text-center border-2 border-green-300">
+        <input type="text" id="passcodeDisplay" readonly value="" class="text-center passcode-input bg-transparent outline-none w-full" placeholder="------">
+      </div>
+
+      <!-- Styled Error Box for Wrong Passcode -->
+      <div id="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-1.5 rounded-full font-bold text-sm mb-2 opacity-0 transition-opacity shadow-sm">
+        Oops, wrong passcode! ❎
+      </div>
+
+      <div class="grid grid-cols-3 gap-2.5">
+        <button class="keypad-btn" onclick="pressKey('1')">1</button>
+        <button class="keypad-btn" onclick="pressKey('2')">2</button>
+        <button class="keypad-btn" onclick="pressKey('3')">3</button>
+        <button class="keypad-btn" onclick="pressKey('4')">4</button>
+        <button class="keypad-btn" onclick="pressKey('5')">5</button>
+        <button class="keypad-btn" onclick="pressKey('6')">6</button>
+        <button class="keypad-btn" onclick="pressKey('7')">7</button>
+        <button class="keypad-btn" onclick="pressKey('8')">8</button>
+        <button class="keypad-btn" onclick="pressKey('9')">9</button>
+        <button class="keypad-btn" onclick="pressKey('.')">.</button>
+        <button class="keypad-btn" onclick="pressKey('0')">0</button>
+        <button class="keypad-btn text-xs text-red-500 font-extrabold" onclick="deleteKey()">DEL</button>
+      </div>
+    </div>
+
+    <div id="page2" class="page">
+    
+      <img src="3.jpg" class="profile-media-circle my-6" autoplay muted loop playsinline webkit-playsinline>
+      <div class="bg-white rounded-full px-5 py-3 w-full flex items-center justify-between shadow-sm border border-green-200 my-4">
+        <span class="text-gray-600 text-sm truncate pr-2">How long have we been together...</span>
+        <button onclick="goToPage(3)" class="text-green-700 hover:scale-110 transition-transform flex-shrink-0 cursor-pointer">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </div>
+
+      <p class="text-green-800 font-semibold mt-4">မှန်ဘီလူး (🔍) ပုံစံလေးကို နှိပ်ပါ။</p>
+    </div>
+
+    <!-- PAGE 3: 3-MONTH ANNI TIMER PAGE (Days: 93 static) -->
+    <div id="page3" class="page">
+      <img src="4.jpg" class="profile-media-dashed my-4" alt="Anni Image">
+
+      <div class="bg-white rounded-2xl p-4 w-full border border-green-200 shadow-sm my-4">
+        <div class="grid grid-cols-4 text-center divide-x divide-gray-200">
+          <div>
+            <div id="days" class="text-green-700 font-bold text-lg">83</div>
+            <div class="text-xs text-gray-500">Days</div>
+          </div>
+          <div>
+            <div id="hours" class="text-green-700 font-bold text-lg">0</div>
+            <div class="text-xs text-gray-500">Hrs</div>
+          </div>
+          <div>
+            <div id="minutes" class="text-green-700 font-bold text-lg">0</div>
+            <div class="text-xs text-gray-500">Mins</div>
+          </div>
+          <div>
+            <div id="seconds" class="text-green-700 font-bold text-sm leading-5 pt-1">0</div>
+            <div class="text-xs text-gray-500">Secs</div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="goToPage(4)" class="w-12 h-12 bg-green-400 rounded-full flex items-center justify-center text-white text-xl shadow-md mt-2 hover:bg-green-500">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <!-- PAGE 4: MAIN MENU NAVIGATION -->
+    <div id="page4" class="page">
+      <div class="bg-green-200 rounded-2xl p-6 w-full text-center shadow-sm mb-8 mt-4">
+        <h3 class="text-green-900 font-bold text-lg">Memories တွေတူတူကြည့်ကြရအောင်နော်💞</h3>
+      </div>
+
+      <div class="flex justify-around w-full mt-6">
+        <!-- Message Icon -->
+        <button onclick="goToPage(5)" class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-green-700 shadow-md border border-green-100 hover:scale-105">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+          </svg>
+        </button>
+        
+        <!-- Camera Icon -->
+        <button onclick="goToPage(6)" class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-green-700 shadow-md border border-green-100 hover:scale-105">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 15c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm9-9h-3.17L16 4H8L6.17 6H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-9 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+          </svg>
+        </button>
+
+        <!-- Game Icon -->
+        <button onclick="goToPage(7)" class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-green-700 shadow-md border border-green-100 hover:scale-105">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H9v2H7v-2H5v-2h2V9h2v2h2v2zm4.5 1c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- PAGE 5: LOVE LETTER PAGE -->
+    <div id="page5" class="page">
+      <div class="bg-white rounded-2xl p-5 w-full border border-green-200 text-left text-gray-700 text-sm leading-relaxed max-h-[440px] overflow-y-auto shadow-inner mb-4">
+        <p class="text-base text-green-900 font-bold mb-2">ကိုကိုရေ…🎀</p>
+        <p class="mb-3">
+          ညီမလေးစိတ်ထဲမှာရှိတာတွေကို ဘယ်လိုစကားလုံးတွေနဲ့ ပြောရမလဲတောင် မသိတော့ဘူး။ ဒါပေမယ့် တစ်ခုတော့သေချာတယ်… ကိုကိုကို ညီမလေးတကယ်ချစ်တယ်။ 🤍 ကိုကိုနဲ့တွေ့ပြီးနောက်ပိုင်း ညီမလေးအတွက် ကိုကိုက ရိုးရိုးလူတစ်ယောက်မဟုတ်တော့ဘူး။ ကိုကိုအသံကြားရတာ၊ ကိုကိုနဲ့စကားပြောရတာ၊ ကိုကိုအကြောင်းတွေးမိတာလေးတွေကအစ ညီမလေးနေ့ရက်တွေထဲမှာ အရေးကြီးလာတယ်။
+        </p>
+        <p class="mb-3">
+          တစ်ခါတလေ ကိုကိုနဲ့ပတ်သက်ပြီး စိတ်မကောင်းဖြစ်တာတွေ၊ ဝမ်းနည်းတာတွေရှိပေမယ့် အဲ့ဒါတွေက ကိုကိုကို မချစ်တော့လိုမဟုတ်ဘူး။ အရမ်းအရေးကြီးလို၊ အရမ်းချစ်လို ဖြစ်လာတာပါ။
+ကိုကိုဆီက ဘာကိုမှ အတင်းတောင်းဆိုချင်တာမဟုတ်ဘူး။ ကိုကိုကို ဖိအားပေးချင်တာလည်းမဟုတ်ဘူး။ ညီမလေးပြောချင်တာတစ်ခုက ကိုကိုအပေါ်ထားတဲ့ ညီမလေးစိတ်က တကယ်ရိုးသားတယ်ဆိုတာပါ။
+ကိုကိုပျော်နေတဲ့အချိန်မှာ ညီမလေးလည်းပျော်ချင်တယ်။ ကိုကိုပင်ပန်းတဲ့အချိန်မှာ ကိုကိုဘေးမှာ နားလည်ပေးနိုင်တဲ့သူတစ်ယောက် ဖြစ်ချင်တယ်။
+
+အနာဂတ်မှာ ဘာတွေဖြစ်လာမလဲ ညီမလေးမသိဘူး။ ဒါပေမယ့် ဒီနေ့အချိန်မှာတော့ ကိုကိုကို ချစ်နေတဲ့ ညီမလေးစိတ်လေးကို လိမ်လိုမရဘူး။
+        </p>
+        <p class="mb-4">
+           ကိုကိုက ညီမလေးဘဝထဲကို ဝင်လာခဲ့တာအတွက် ကျေးဇူးတင်တယ်။ ကိုကိုနဲ့တွေ့ခဲ့ရတာ၊ ကိုကိုကို ချစ်မိခဲ့ရတာကိုလည်း ညီမလေးနောင်တမရဘူး။
+
+ကိုကိုရေ…
+ညီမလေးက ကိုကိုကို အရမ်းချစ်တယ်။
+စကားလုံးတွေနဲ့ ပြောတာထက် ပိုပြီး ချစ်တယ်။ 🥺🧡
+
+ဒီစာလေးကို ဖတ်ပြီး ကိုကိုတစ်ခုပဲ သိထားပေးပါ…
+ညီမလေးအချစ်က ကိုကိုအတွက် တကယ်ပါ။
+        </p>
+        <div class="text-right font-bold text-gray-800 mt-6">
+          <p class="text-base mb-1">🗓️</p>
+        </div>
+      </div>
+
+      <button onclick="goToPage(4)" class="nav-btn my-2">
+        ◀◀ Back
+      </button>
+    </div>
+
+    <!-- PAGE 6: GALLERY (3x2 GRID LAYOUT) -->
+    <div id="page6" class="page">
+      <h3 class="text-green-800 font-bold text-lg mb-3 flex items-center justify-center gap-2">
+        Our Memories 📸
+      </h3>
+
+      <div class="grid-gallery-container">
+    <img src="1.jpg" class="w-full h-24 object-cover rounded-xl shadow-sm border border-white" alt="Mem 1">
+      <img src="2.jpg" class="w-full h-24 object-cover rounded-xl shadow-sm border border-white" alt="Mem 2">
+        <img src="3.jpg" class="w-full h-24 object-cover rounded-xl shadow-sm border border-white" alt="Mem 3">
+        <img src="4.jpg" class="w-full h-24 object-cover rounded-xl shadow-sm border border-white" alt="Mem 4">
+        <img src="5.jpg" class="w-full h-24 object-cover rounded-xl shadow-sm border border-white" alt="Mem 5">
+        <img src="6.jpg" class="w-full h-24 object-cover rounded-xl shadow-sm border border-white" alt="Mem 6">
+      </div>
+
+      <button onclick="goToPage(4)" class="nav-btn">
+        ◀◀ Back
+      </button>
+    </div>
+
+    <!-- PAGE 7: CATCH HEARTS GAME (FINAL PAGE) -->
+    <div id="page7" class="page">
+      <div class="bg-pink-200 text-pink-800 font-bold px-6 py-2 rounded-xl mb-3 text-lg">
+        အမှတ်ပြည့် <span id="score">0</span> / 10
+      </div>
+
+      <div class="game-container">
+        <canvas id="gameCanvas" width="280" height="280"></canvas>
+        <div id="gameFeedbackContainer"></div>
+      </div>
+
+      <div class="mt-3">
+        <button id="startGameBtn" onclick="startGame()" class="bg-pink-500 text-white font-bold px-6 py-2 rounded-full shadow hover:bg-pink-600 mb-2">
+          ဂိမ်းစတင်ရန် 🎮
+        </button>
+      </div>
+
+      <p class="text-xs text-pink-700 font-medium my-2">❤️ အသည်းပုံကို ယုန်လေးဖြင့် ဆွဲယူဖမ်းပါ</p>
+
+      <button onclick="goToPage(4)" class="nav-btn mt-2">
+        ◀◀ Back
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    /* Ensure videos autoplay smoothly on iOS and Android */
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll('video').forEach(vid => {
+        vid.muted = true;
+        vid.play().catch(() => {});
+      });
+    });
+
+    /* Audio Handling Logic */
+    function startAudio() {
+      const audio = document.getElementById('bgMusic');
+      const musicBtn = document.getElementById('musicBtn');
+      if (audio.paused) {
+        audio.play().then(() => {
+          musicBtn.classList.add('spin-music');
+        }).catch(err => {
+          console.log("Audio play deferred for user interaction:", err);
+        });
+      }
+    }
+
+    function toggleAudio() {
+      const audio = document.getElementById('bgMusic');
+      const musicBtn = document.getElementById('musicBtn');
+      
+      if (audio.paused) {
+        audio.play();
+        musicBtn.classList.add('spin-music');
+      } else {
+        audio.pause();
+        musicBtn.classList.remove('spin-music');
+      }
+    }
+
+    document.addEventListener('click', function initAudioOnInteraction() {
+      startAudio();
+      document.removeEventListener('click', initAudioOnInteraction);
+    }, { once: true });
+
+    /* Passcode Logic (230826 - 6 digits) */
+    let currentPasscode = "";
+    const correctPasscode = "230826";
+
+    function pressKey(num) {
+      startAudio();
+      if (currentPasscode.length < 6) {
+        currentPasscode += num;
+        updatePasscodeDisplay();
+      }
+      if (currentPasscode.length === 6) {
+        if (currentPasscode === correctPasscode) {
+          document.getElementById('errorMessage').classList.add('opacity-0');
+          setTimeout(() => {
+            goToPage(2);
+          }, 300);
+        } else {
+          document.getElementById('errorMessage').classList.remove('opacity-0');
+          setTimeout(() => {
+            currentPasscode = "";
+            updatePasscodeDisplay();
+          }, 800);
+        }
+      }
+    }
+
+    function deleteKey() {
+      currentPasscode = currentPasscode.slice(0, -1);
+      updatePasscodeDisplay();
+    }
+
+    function updatePasscodeDisplay() {
+      document.getElementById('passcodeDisplay').value = "*".repeat(currentPasscode.length);
+    }
+
+    /* Timer logic for hours, minutes, seconds only (Days is static 93) */
+    function updateTimerClock() {
+      const now = new Date();
+      document.getElementById('hours').innerText = now.getHours();
+      document.getElementById('minutes').innerText = now.getMinutes();
+      document.getElementById('seconds').innerText = now.getSeconds();
+    }
+
+    setInterval(updateTimerClock, 1000);
+    updateTimerClock();
+
+    /* Page Navigation */
+    function goToPage(pageNumber) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const targetPage = document.getElementById(`page${pageNumber}`);
+      targetPage.classList.add('active');
+
+      const activeVideo = targetPage.querySelector('video');
+      if (activeVideo) {
+        activeVideo.muted = true;
+        activeVideo.play().catch(() => {});
+      }
+    }
+
+    /* Catch Hearts Game Logic */
+    let gameCanvas = document.getElementById('gameCanvas');
+    let ctx = gameCanvas.getContext('2d');
+    let score = 0;
+    let gameInterval = null;
+
+    let rabbit = { x: 120, y: 220, size: 40 };
+    let heart = { x: 130, y: 0, size: 24, speed: 3 };
+
+    const catchMessages = [
+      "တော်တယ်! 💖",
+      "ဆက်ကြိုးစား! 💪",
+      "မိုက်တယ်! 🔥",
+      "အရမ်းတော်တယ်! ✨",
+      "Amazing! 😎",
+      "Cool 🌟",
+      "ဆက်ကြိုးစား! 💥",
+      "နောက်ထပ် ၂ လုံးပဲ! 🎯",
+      "နောက်ဆုံး ၁ လုံး! 🚀",
+      "အောင်မြင်ပြီ! 🎉"
+    ];
+
+    function showCatchFeedback(text) {
+      const container = document.getElementById('gameFeedbackContainer');
+      const el = document.createElement('div');
+      el.className = 'feedback-text';
+      el.innerText = text;
+      container.appendChild(el);
+
+      setTimeout(() => {
+        if (el.parentNode) {
+          el.parentNode.removeChild(el);
+        }
+      }, 1200);
+    }
+
+    function startGame() {
+      score = 0;
+      document.getElementById('score').innerText = score;
+      document.getElementById('startGameBtn').style.display = 'none';
+      heart.y = 0;
+      heart.x = Math.random() * (gameCanvas.width - 30);
+      
+      if (gameInterval) clearInterval(gameInterval);
+      gameInterval = setInterval(updateGame, 1000 / 60);
+    }
+
+    function updateGame() {
+      ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+      ctx.font = "24px serif";
+      ctx.fillText("💖", heart.x, heart.y);
+
+      ctx.font = "36px serif";
+      ctx.fillText("🐰", rabbit.x, rabbit.y);
+
+      heart.y += heart.speed;
+
+      if (
+        heart.y >= rabbit.y - 20 &&
+        heart.y <= rabbit.y + 20 &&
+        heart.x >= rabbit.x - 20 &&
+        heart.x <= rabbit.x + 30
+      ) {
+        score++;
+        document.getElementById('score').innerText = score;
+        showCatchFeedback(catchMessages[score - 1] || "တော်တယ်! 💖");
+
+        heart.y = 0;
+        heart.x = Math.random() * (gameCanvas.width - 30);
+
+        if (score >= 10) {
+          clearInterval(gameInterval);
+          document.getElementById('startGameBtn').style.display = 'inline-block';
+        }
+      }
+
+      if (heart.y > gameCanvas.height) {
+        heart.y = 0;
+        heart.x = Math.random() * (gameCanvas.width - 30);
+      }
+    }
+
+    function moveRabbit(e) {
+      let rect = gameCanvas.getBoundingClientRect();
+      let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      rabbit.x = clientX - rect.left - 20;
+    }
+
+    gameCanvas.addEventListener('mousemove', moveRabbit);
+    gameCanvas.addEventListener('touchmove', moveRabbit, { passive: true });
+  </script>
+</body>
+</html>
